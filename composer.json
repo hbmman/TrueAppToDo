@@ -1,0 +1,16 @@
+{
+    "name": "oleksii.grygorchuk/true-to-do",
+    "authors": [
+        {
+            "name": "hbmman",
+            "email": "alekseymanhbm@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\" : "app",
+            "Engine\\" : "engine"
+        }
+    }
+}
