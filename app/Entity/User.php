@@ -6,6 +6,8 @@ namespace App\Entity;
 
 class User
 {
+    public const STATUS_ADMIN = 1;
+    public const STATUS_DEFAULT = 2;
     /**
      * @var int|null
      */
@@ -22,6 +24,11 @@ class User
     private $password;
 
     /**
+     * @var
+     */
+    private $status;
+
+    /**
      * User constructor.
      * @param $login
      * @param $password
@@ -30,6 +37,7 @@ class User
     {
         $this->login = $login;
         $this->password = $password;
+        $this->status = self::STATUS_DEFAULT;
     }
 
     /**
@@ -55,5 +63,13 @@ class User
     public function verifyPassword(string $password)
     {
         return $this->password === $password;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus():int
+    {
+        return $this->status;
     }
 }
