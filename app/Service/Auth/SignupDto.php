@@ -6,7 +6,7 @@ namespace App\Service\Auth;
 
 class SignupDto
 {
-    public $login;
-    public $password;
+    public string $login;
+    public string $password;
 
 }

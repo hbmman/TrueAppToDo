@@ -10,7 +10,9 @@ use Engine\Container\Container;
 use App\Repository\UserRepository;
 use App\Database\Connection;
 use App\Storage\SessionStorage;
-
+use App\Controller\FilesController;
+use App\Service\Files\FilesService;
+use App\Repository\FileRepository;
 
 require_once dirname(__DIR__) . "/vendor/autoload.php";
 
@@ -19,11 +21,15 @@ $container = new Container();
 
 $router->add('/signup', AuthController::class, "signup");
 $router->add('/login', AuthController::class, "login");
+$router->add('/files/upload', FilesController::class, "upload");
 
+
+$container->set('upload.dir', function (){
+    return dirname(__DIR__) . "/uploads";
+});
 $container->set(SessionStorage::class, function (){
     return new SessionStorage();
 });
-
 $container->set(Connection::class, function (Container $container){
     return new Connection("mysql:host=localhost:8889;dbname=todo_true", "hbmman", "secret"); //mysql://hbmman:secret@127.0.0.1:8889/true_App
 });
@@ -41,9 +47,23 @@ $container->set(AuthService::class, function(Container $container){
         $container->get(SessionStorage::class)
     );
 });
-
 $container->set(AuthController::class, function (Container $container) {
     return new AuthController($container->get(AuthService::class));
+});
+
+
+$container->set(FileRepository::class, function (Container $container){
+    return new FileRepository($container->get(Connection::class));
+});
+$container->set(FilesService::class, function (Container $container){
+    return new FilesService(
+        $container->get('upload.dir'),
+        $container->get(FileRepository::class)
+    );
+});
+$container->set(FilesController::class, function (Container $container){
+    return new FilesController(
+        $container->get(FilesService::class));
 });
 
 $match = $router->match($_SERVER['REQUEST_URI']);

@@ -13,7 +13,7 @@ class AuthController
     /**
      * @var AuthService
      */
-    private $authService;
+    private AuthService$authService;
 
     public function __construct(AuthService $authService)
     {
