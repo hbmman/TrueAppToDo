@@ -43,4 +43,31 @@ class FileRepository
 
         $accessor->setPropertyValue('id', (int)$this->connection->lastInsertId());
     }
+
+    public function get(int $id):?File
+    {
+        $stm = $this->connection->prepare(
+            "SELECT * FROM files WHERE id =:id"
+        );
+
+        $stm->execute(['id' => $id]);
+
+        if(!$row = $stm->fetch(\PDO::FETCH_ASSOC)){
+            throw new \DomainException("File not found");
+        }
+
+        /** @var File $file */
+        $file = (new \ReflectionClass(File::class))->newInstanceWithoutConstructor();
+
+        $accessor = new ObjectPropertyAccessor($file);
+
+        $accessor->setPropertyValue('id', (int)$row['id']);
+        $accessor->setPropertyValue('path', (string)$row['path']);
+        $accessor->setPropertyValue('filename', (string)$row['filename']);
+        $accessor->setPropertyValue('size', (int)$row['size']);
+        $accessor->setPropertyValue('mimeType', (string)$row['mime_type']);
+        $accessor->setPropertyValue('extension', (string)$row['extension']);
+
+        return $file;
+    }
 }

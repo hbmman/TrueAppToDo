@@ -14,11 +14,14 @@ class FilesService
      */
     private string $uploadDir;
 
-    private $fileRepository;
-    public function __construct(string $uploadDir, FileRepository $fileRepository)
+    /**
+     * @var FileRepository
+     */
+    private FileRepository $files;
+    public function __construct(string $uploadDir, FileRepository $files)
     {
         $this->uploadDir = $uploadDir;
-        $this->fileRepository = $fileRepository;
+        $this->files = $files;
     }
 
     public function upload(UploadFileInfo $info):File
@@ -28,7 +31,7 @@ class FilesService
         }
 
         $name = urlencode(basename($info->name));
-        $ext = pathinfo($info->name, PATHINFO_EXTENSION);
+        $ext = pathinfo($name, PATHINFO_EXTENSION);
         $uniq = uniqid();
         if(!move_uploaded_file($info->tmp, "$this->uploadDir/". $path = "{$uniq}.$ext")){
             throw new \DomainException("Cannot upload file");
@@ -36,8 +39,13 @@ class FilesService
 
         $file = new File($path, $info->mimeType, $info->size);
 
-        $this->fileRepository->add($file);
+        $this->files->add($file);
 
         return $file;
+    }
+
+    public function getById(int $id):?File
+    {
+        return $this->files->get($id);
     }
 }

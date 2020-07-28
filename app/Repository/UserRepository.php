@@ -55,4 +55,27 @@ class UserRepository
 
         return $user;
     }
+
+    public function get(int $id):?User
+    {
+        $stmt = $this->connection->prepare("SELECT * FROM users WHERE id = :id");
+
+        $stmt->execute(['lid' => $id]);
+
+        if(!$row = $stmt->fetch(\PDO::FETCH_ASSOC)){
+            throw new \DomainException("User not found");
+        }
+
+        /** @var User $user */
+        $user = (new \ReflectionClass(User::class))->newInstanceWithoutConstructor();
+
+        $accessor = new ObjectPropertyAccessor($user);
+
+        $accessor->setPropertyValue('id', (int)$row['id']);
+        $accessor->setPropertyValue('status', (string)$row['status']);
+        $accessor->setPropertyValue('login', (string)$row['login']);
+        $accessor->setPropertyValue('password', (string)$row['password']);
+
+        return $user;
+    }
 }

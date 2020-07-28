@@ -22,6 +22,7 @@ $container = new Container();
 $router->add('/signup', AuthController::class, "signup");
 $router->add('/login', AuthController::class, "login");
 $router->add('/files/upload', FilesController::class, "upload");
+$router->add('/files/display', FilesController::class, "display");
 
 
 $container->set('upload.dir', function (){
@@ -66,7 +67,7 @@ $container->set(FilesController::class, function (Container $container){
         $container->get(FilesService::class));
 });
 
-$match = $router->match($_SERVER['REQUEST_URI']);
+$match = $router->match(preg_replace("#\?.*#", null, $_SERVER['REQUEST_URI']));
 
 var_dump($match);
 

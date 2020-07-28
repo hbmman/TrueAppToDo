@@ -27,7 +27,7 @@ class FilesController
         $info->mimeType = $_FILES['file']['type'];
         $info->name = $_FILES['file']['name'];
         $info->error = $_FILES['file']['error'];
-        $info->tmp  = $_FILES['file']['tmp_name'];
+        $info->tmp = $_FILES['file']['tmp_name'];
 
         $file = $this->fileService->upload($info);
 
@@ -40,8 +40,14 @@ class FilesController
         ]);
     }
 
-    public function display():void
+    public function display():?string
     {
+        $file = $this->fileService->getById((int)$_GET['id']);
+
+        header("Content-type:" .$file->getMimeType());
+        var_dump($file);
+        return file_get_contents(__DIR__ . "./../../uploads/" . $file->getPath());
+
 
     }
 }
