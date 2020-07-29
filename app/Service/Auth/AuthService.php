@@ -28,8 +28,11 @@ class AuthService
 
     public function signup(SignupDto $dto):User
     {
-        $user = new User($dto->login, $dto->password);
+        if($userExist = $this->users->findOneByLogin($dto->login)){
+            throw  new \DomainException("This login name is already in use ");
+        }
 
+        $user = new User($dto->login, $dto->password);
         $this->users->add($user);
         return $user;
     }

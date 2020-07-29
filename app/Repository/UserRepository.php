@@ -49,7 +49,7 @@ class UserRepository
         $accessor = new ObjectPropertyAccessor($user);
 
         $accessor->setPropertyValue('id', (int)$row['id']);
-        $accessor->setPropertyValue('status', (string)$row['status']);
+        $accessor->setPropertyValue('status', (int)$row['status']);
         $accessor->setPropertyValue('login', (string)$row['login']);
         $accessor->setPropertyValue('password', (string)$row['password']);
 
@@ -60,7 +60,7 @@ class UserRepository
     {
         $stmt = $this->connection->prepare("SELECT * FROM users WHERE id = :id");
 
-        $stmt->execute(['lid' => $id]);
+        $stmt->execute(['id' => $id]);
 
         if(!$row = $stmt->fetch(\PDO::FETCH_ASSOC)){
             throw new \DomainException("User not found");
@@ -72,7 +72,7 @@ class UserRepository
         $accessor = new ObjectPropertyAccessor($user);
 
         $accessor->setPropertyValue('id', (int)$row['id']);
-        $accessor->setPropertyValue('status', (string)$row['status']);
+        $accessor->setPropertyValue('status', (int)$row['status']);
         $accessor->setPropertyValue('login', (string)$row['login']);
         $accessor->setPropertyValue('password', (string)$row['password']);
 

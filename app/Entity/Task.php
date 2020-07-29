@@ -38,7 +38,7 @@ class Task
     private $status;
 
     /**
-     * @var File
+     * @var File|null
      */
     private $attachment;
 
@@ -123,9 +123,9 @@ class Task
     }
 
     /**
-     * @return File
+     * @return File|null
      */
-    public function getAttachment(): File
+    public function getAttachment(): ?File
     {
         return $this->attachment;
     }

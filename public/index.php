@@ -3,8 +3,12 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+use App\Acl\Acl;
 use App\Controller\AuthController;
+use App\Controller\TaskController;
+use App\Repository\TaskRepository;
 use App\Service\Auth\AuthService;
+use App\Service\Tasks\TaskService;
 use Engine\Router\Router;
 use Engine\Container\Container;
 use App\Repository\UserRepository;
@@ -23,6 +27,8 @@ $router->add('/signup', AuthController::class, "signup");
 $router->add('/login', AuthController::class, "login");
 $router->add('/files/upload', FilesController::class, "upload");
 $router->add('/files/display', FilesController::class, "display");
+$router->add('/tasks/create', TaskController::class, "create");
+$router->add('/tasks', TaskController::class, "index");
 
 
 $container->set('upload.dir', function (){
@@ -38,6 +44,13 @@ $container->set(Connection::class, function (Container $container){
 /** @var Connection $connection */
 $connection = $container->get(Connection::class);
 $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+$container->set(Acl::class, function (Container $container){
+    return new Acl(
+        $container->get(SessionStorage::class));
+});
+
 
 $container->set(UserRepository::class, function (Container $container){
     return new UserRepository($container->get(Connection::class));
@@ -67,11 +80,37 @@ $container->set(FilesController::class, function (Container $container){
         $container->get(FilesService::class));
 });
 
+$container->set(TaskRepository::class, function (Container $container){
+    return new TaskRepository($container->get(Connection::class));
+});
+
+$container->set(TaskService::class, function (Container $container){
+    return new TaskService(
+        $container->get(UserRepository::class),
+        $container->get(FileRepository::class),
+        $container->get(TaskRepository::class)
+    );
+});
+
+$container->set(TaskController::class, function (Container $container){
+    return new TaskController(
+        $container->get(TaskService::class)
+    );
+});
+
+
 $match = $router->match(preg_replace("#\?.*#", null, $_SERVER['REQUEST_URI']));
 
-var_dump($match);
+//var_dump($match);
 
+/** @var Acl $acl */
+$acl = $container->get(Acl::class);
 
+var_dump($_SESSION);
+
+if(!$acl->isAllow($match['_route'])){
+    throw new DomainException("Not access");
+}
 
 $controller = $container->get($match['_controller']);
 
